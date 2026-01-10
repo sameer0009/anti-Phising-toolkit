@@ -75,5 +75,4 @@ The system follows a microservices event-driven architecture.
 ## ⚖️ Compliance
 Designed with **GDPR**, **HIPAA**, and **ISO 27001** standards in mind, featuring automated PII redaction and encrypted data flows.
 
-## 📄 License
-MIT License. Created by AntiGravity AI for Enterprise Security.
+
