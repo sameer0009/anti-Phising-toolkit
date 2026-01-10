@@ -3,10 +3,11 @@ from pydantic import BaseModel
 from typing import List, Optional
 import time
 
-# Import our analysis modules
 from src.data.preprocess import Preprocessor
 from src.features.nlp_advanced import AdvancedNLPAnalyzer
 from src.features.llm_gemini import GeminiAnalyzer
+
+router = APIRouter()
 
 # Initialize Singletons
 preprocessor = Preprocessor()
