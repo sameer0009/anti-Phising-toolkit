@@ -1,11 +1,67 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { ShieldAlert, Activity, Lock, Search, AlertTriangle, TrendingUp, Database, Zap, Brain, FileText } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShieldAlert, Activity, Lock, Search, TrendingUp, Database, Zap, Brain, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
+
+// Types
+interface Log {
+    id: number;
+    timestamp: string;
+    severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+    source: string;
+    event: string;
+    ip: string;
+    action: 'BLOCKED' | 'QUARANTINED' | 'FLAGGED' | 'ALLOWED';
+}
+
+interface StatCardProps {
+    title: string;
+    value: string;
+    change: string;
+    icon: React.ReactNode;
+}
+
+interface SIEMLogsTabProps {
+    logs: Log[];
+    selectedLog: Log | null;
+    setSelectedLog: (log: Log) => void;
+}
+
+interface MetricCardProps {
+    title: string;
+    value: string;
+    status: 'excellent' | 'good' | 'warning';
+}
+
+interface ThreatTrend {
+    time: string;
+    phishing: number;
+    malware: number;
+    spam: number;
+}
+
+interface AttackVector {
+    name: string;
+    value: number;
+    color: string;
+}
+
+interface DetectionAccuracy {
+    model: string;
+    accuracy: number;
+}
+
+interface AIRecommendation {
+    id: number;
+    priority: 'HIGH' | 'MEDIUM' | 'CRITICAL';
+    title: string;
+    description: string;
+    confidence: number;
+}
 
 // Mock SIEM Log Data
-const SIEM_LOGS = [
+const SIEM_LOGS: Log[] = [
     { id: 1, timestamp: '2026-01-11 00:45:23', severity: 'CRITICAL', source: 'Email Gateway', event: 'Phishing attempt detected', ip: '203.0.113.45', action: 'BLOCKED' },
     { id: 2, timestamp: '2026-01-11 00:44:18', severity: 'HIGH', source: 'Web Filter', event: 'Malicious URL access attempt', ip: '198.51.100.22', action: 'QUARANTINED' },
     { id: 3, timestamp: '2026-01-11 00:43:52', severity: 'MEDIUM', source: 'Email Gateway', event: 'Suspicious attachment scanned', ip: '192.0.2.178', action: 'FLAGGED' },
@@ -14,7 +70,7 @@ const SIEM_LOGS = [
 ];
 
 // Analytics Data
-const THREAT_TRENDS = [
+const THREAT_TRENDS: ThreatTrend[] = [
     { time: '00:00', phishing: 12, malware: 5, spam: 45 },
     { time: '04:00', phishing: 8, malware: 3, spam: 32 },
     { time: '08:00', phishing: 25, malware: 12, spam: 78 },
@@ -23,14 +79,14 @@ const THREAT_TRENDS = [
     { time: '20:00', phishing: 28, malware: 9, spam: 61 },
 ];
 
-const ATTACK_VECTORS = [
+const ATTACK_VECTORS: AttackVector[] = [
     { name: 'Email Phishing', value: 45, color: '#ef4444' },
     { name: 'Malicious URLs', value: 28, color: '#f59e0b' },
     { name: 'Smishing', value: 15, color: '#eab308' },
     { name: 'BEC', value: 12, color: '#3b82f6' },
 ];
 
-const DETECTION_ACCURACY = [
+const DETECTION_ACCURACY: DetectionAccuracy[] = [
     { model: 'DistilBERT', accuracy: 98.5 },
     { model: 'Random Forest', accuracy: 94.2 },
     { model: 'URL CNN', accuracy: 96.8 },
@@ -38,14 +94,14 @@ const DETECTION_ACCURACY = [
 ];
 
 // AI Recommendations
-const AI_RECOMMENDATIONS = [
+const AI_RECOMMENDATIONS: AIRecommendation[] = [
     { id: 1, priority: 'HIGH', title: 'Increase Email Gateway Filtering', description: 'Detected 42% spike in phishing attempts from domain *.microsoft-security-update.com. Recommend adding to blocklist.', confidence: 0.95 },
     { id: 2, priority: 'MEDIUM', title: 'Update User Training', description: 'Users in Finance dept clicked 3 suspicious links this week. Schedule phishing awareness training.', confidence: 0.87 },
     { id: 3, priority: 'CRITICAL', title: 'Potential Zero-Day Campaign', description: 'Gemini AI identified novel attack pattern using QR codes in PDF attachments. Immediate investigation required.', confidence: 0.92 },
 ];
 
 export default function Dashboard() {
-    const [selectedLog, setSelectedLog] = useState(null);
+    const [selectedLog, setSelectedLog] = useState<Log | null>(null);
     const [activeTab, setActiveTab] = useState('overview');
 
     return (
@@ -98,7 +154,7 @@ export default function Dashboard() {
     );
 }
 
-function StatCard({ title, value, change, icon }) {
+function StatCard({ title, value, change, icon }: StatCardProps) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -151,7 +207,7 @@ function OverviewTab() {
                             cx="50%"
                             cy="50%"
                             labelLine={false}
-                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                            label={({ name, percent }: { name: string; percent: number }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                             outerRadius={100}
                             fill="#8884d8"
                             dataKey="value"
@@ -197,7 +253,7 @@ function AnalyticsTab() {
     );
 }
 
-function SIEMLogsTab({ logs, selectedLog, setSelectedLog }) {
+function SIEMLogsTab({ logs, selectedLog, setSelectedLog }: SIEMLogsTabProps) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Log Table */}
@@ -331,7 +387,7 @@ function AIInsightsTab() {
     );
 }
 
-function MetricCard({ title, value, status }) {
+function MetricCard({ title, value, status }: MetricCardProps) {
     const statusColors = {
         excellent: 'text-green-400',
         good: 'text-blue-400',
